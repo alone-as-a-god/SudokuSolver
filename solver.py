@@ -1,54 +1,49 @@
-#grid = [[3, 0, 6, 5, 0, 8, 4, 0, 0],
- #       [5, 2, 0, 0, 0, 0, 0, 0, 0],
-  #      [0, 8, 7, 0, 0, 0, 0, 3, 1],
-   #     [0, 0, 3, 0, 1, 0, 0, 8, 0],
-    #    [9, 0, 0, 8, 6, 3, 0, 0, 5],
-     #   [0, 5, 0, 0, 9, 0, 6, 0, 0],
-        #[1, 3, 0, 0, 0, 0, 2, 5, 0],
-      #  [0, 0, 0, 0, 0, 0, 0, 7, 4],
-       # [0, 0, 5, 2, 0, 6, 3, 0, 0]]
+# Description: This file contains the functions to solve the sudoku puzzle
 
-
-def print_grid(grid):
-    for row in grid:
-        print(row)
-
-
+# Function to determine if a specified placement for a number is legal
+# Input: grid, row, column, number
+# Output: True if legal, False if illegal
 def check_legal(grid, row, column, number):
-    # Check row for duplicate number
+    # Check the row for duplicate number
     for x in range(9):
         if grid[row][x] == number:
             return False
 
-    # Check column for duplicate number
+    # Check the column for duplicate number
     for x in range(9):
         if grid[x][column] == number:
             return False
 
-    startRow = row - row % 3
-    startColumn = column - column % 3
+    # Check the 3x3 grid for duplicate number
+    start_row = row - row % 3
+    start_column = column - column % 3
     for i in range(3):
         for j in range(3):
-            if grid[i + startRow][j + startColumn] == number:
+            if grid[i + start_row][j + start_column] == number:
                 return False
+
     return True
 
+
+# Recursive function to solve the sudoku puzzle
+# Input: grid, row, column
+# Output: True if solved, False if unsolvable
 def solve_sudoku(grid, row, column):
-    if row == 8 and column == 9:
+    if row == 8 and column == 9:    # Base case, puzzle is solved
         return True
 
-    if column == len(grid[0]):
+    if column == len(grid[0]):    # If we reach the end of a row, move to the next line
         column = 0
         row = row + 1
 
-    if grid[row][column] > 0:
+    if grid[row][column] > 0:   # If the current cell is already filled, move to the next cell
         return solve_sudoku(grid, row, column + 1)
 
-    for n in range(1, len(grid) + 1, 1):
-        if check_legal(grid, row, column, n):
+    for n in range(1, len(grid) + 1, 1):    # Try all numbers from 1 to 9
+        if check_legal(grid, row, column, n):   # If the number is legal, place it in the cell
             grid[row][column] = n
             if solve_sudoku(grid, row, column + 1):
                 return True
 
-        grid[row][column] = 0
+        grid[row][column] = 0       # If the number is illegal, reset the cell and try again
     return False
