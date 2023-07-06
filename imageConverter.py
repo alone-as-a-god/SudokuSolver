@@ -81,7 +81,7 @@ def display_numbers(img, numbers, color=(0, 255, 255)):
 def handle_input(image):
     board, location = find_board(image)  # Find the Sudoku board
     if board is None or location is None:  # if no board is found return the original image
-        return image
+        return None
 
     # Converts the board into a 9x9 array of grayscale cells
     gray = cv2.cvtColor(board, cv2.COLOR_BGR2GRAY)
