@@ -65,7 +65,7 @@ def find_board(img):
     return result, location  # Return the board and its location
 
 
-def display_numbers(img, numbers, color=(0, 255, 9)):
+def display_numbers(img, numbers, color=(0, 255, 255)):
     w = int(img.shape[1] / 9)  # Width of each cell
     h = int(img.shape[0] / 9)  # Height of each cell
     for i in range(9):
@@ -85,30 +85,33 @@ def handle_input(image):
 
     # Converts the board into a 9x9 array of grayscale cells
     gray = cv2.cvtColor(board, cv2.COLOR_BGR2GRAY)
-    rois = split_board(gray)
-    rois = numpy.array(rois).reshape(-1, input_size, input_size, 1)
+    cells = split_board(gray)
+    cells = numpy.array(cells).reshape(-1, input_size, input_size, 1)
 
-    classes = numpy.arange(0, 10)
-    model = tensorflow.keras.models.load_model("model-OCR.h5")
-    predictions = model.predict(rois)
+    classes = numpy.arange(0, 10)  # Creates an array consisting of numbers from 0-9
+    model = tensorflow.keras.models.load_model("model.h5")
+    predictions = model.predict(cells)  # Uses an OCR model to get possible numbers for each cell
     predicted_numbers = []
 
     for i in predictions:
-        index = (numpy.argmax(i))
-        predicted_number = classes[index]
-        predicted_numbers.append(predicted_number)
+        index = (numpy.argmax(i))  # Finds the index of the highest probability
+        predicted_number = classes[index]  # Gets the number corresponding to the index
+        predicted_numbers.append(predicted_number)  # Appends the number to the list
 
-    read_board = numpy.array(predicted_numbers).reshape(9, 9)
+    read_board = numpy.array(predicted_numbers).reshape(9, 9)  # Reshapes the list into a 9x9 array
 
-    solver.solve_sudoku(read_board, 0, 0)
+    solver.solve_sudoku(read_board, 0, 0)  # Solves the Sudoku board
 
+    # Creates a mask array where 0 is a cell that was originally empty and 1 is a cell that was originally filled
     bin_arr = numpy.where(numpy.array(predicted_numbers) > 0, 0, 1)
 
+    # Collapses read_board into one dimension and then multiplies the solved board by the mask array
+    # That way we're left with the numbers that were added by the solving function
     flat_solved_board_nums = read_board.flatten() * bin_arr
 
-    mask = numpy.zeros_like(board)
-    res = display_numbers(mask, flat_solved_board_nums)
-    inv = get_inv_perspective(image, res, location)
+    mask = numpy.zeros_like(board)  # Creates a zero array with the same shape as the board
+    res = display_numbers(mask, flat_solved_board_nums)  # Displays the solved cells onto the mask array
+    inv = get_inv_perspective(image, res, location)  # Applies the perspective of the original picture to the solved board
 
-    combined = cv2.addWeighted(image, 0.7, inv, 1, 0)
+    combined = cv2.addWeighted(image, 0.7, inv, 1, 0)  # Combines the original image with the solved board
     return combined
