@@ -1,0 +1,5 @@
+pyfiglet~=0.8.post1
+Pillow~=10.0.0
+numpy~=1.25.0
+tensorflow~=2.13.0rc2
+imutils~=0.5.4
