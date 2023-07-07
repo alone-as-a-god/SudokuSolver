@@ -1,6 +1,7 @@
 # Sudoku Solver
 
-As one might guess, Sudoku Solver is a tool to solve Sudoku's.
+Sudoku Solver is a tool to solve Sudokus by locating the Sudoku board in pictures and then filling out the empty cells.
+
 It uses a form of backtracking to solve the puzzle.
 
 ## Usage
